@@ -1,0 +1,10 @@
+# kicad
+pcb/.history/
+pcb/waypoint-backups/
+
+# temporary files
+*.bak
+*.bck
+*-bak
+*-cache
+*~
