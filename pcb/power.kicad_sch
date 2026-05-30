@@ -2876,12 +2876,6 @@
 		(uuid "3065bdac-1818-486f-9410-e6c4a2fdbe90")
 	)
 	(junction
-		(at 205.74 99.06)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "37d5bfec-e2c1-4aa6-bc43-23d50b828d78")
-	)
-	(junction
 		(at 43.18 29.21)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3002,6 +2996,12 @@
 		(uuid "df3a1628-0980-4ec2-a903-741dda2a6ffd")
 	)
 	(junction
+		(at 205.74 90.17)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "e0d859a2-287f-45ed-8644-587d8e24b2c2")
+	)
+	(junction
 		(at 90.17 55.88)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3040,11 +3040,11 @@
 		(uuid "4709cf5a-82bc-422a-a1d4-78000c6a68ee")
 	)
 	(no_connect
-		(at 200.66 93.98)
+		(at 182.88 85.09)
 		(uuid "4da3e2fd-6e23-4498-95aa-ca740a0c625e")
 	)
 	(no_connect
-		(at 185.42 99.06)
+		(at 167.64 90.17)
 		(uuid "7f24bef2-1ab6-4a83-a88b-bbd5a17ed77b")
 	)
 	(no_connect
@@ -3137,7 +3137,7 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 99.06) (xy 205.74 99.06)
+			(xy 182.88 90.17) (xy 205.74 90.17)
 		)
 		(stroke
 			(width 0)
@@ -3697,7 +3697,7 @@
 	)
 	(wire
 		(pts
-			(xy 205.74 74.93) (xy 205.74 99.06)
+			(xy 205.74 74.93) (xy 205.74 90.17)
 		)
 		(stroke
 			(width 0)
@@ -3884,6 +3884,16 @@
 			(type default)
 		)
 		(uuid "912cfffa-3607-49b1-95d0-5109e7abf377")
+	)
+	(wire
+		(pts
+			(xy 205.74 90.17) (xy 205.74 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "940cb790-b99a-4ea9-92f2-3f68bd50a660")
 	)
 	(wire
 		(pts
@@ -4177,7 +4187,7 @@
 	)
 	(wire
 		(pts
-			(xy 172.72 93.98) (xy 185.42 93.98)
+			(xy 156.21 85.09) (xy 167.64 85.09)
 		)
 		(stroke
 			(width 0)
@@ -4476,7 +4486,7 @@
 		(uuid "0b78b11f-d6b7-4e89-aeea-f59952ffa328")
 	)
 	(label "VSYS"
-		(at 172.72 93.98 0)
+		(at 156.21 85.09 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -5690,7 +5700,7 @@
 	)
 	(symbol
 		(lib_id "lcsc:SKRPACE010")
-		(at 193.04 95.25 0)
+		(at 175.26 86.36 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5701,7 +5711,7 @@
 		(fields_autoplaced yes)
 		(uuid "3a2cfb74-98f7-4a69-b1bb-f23afbc7284f")
 		(property "Reference" "SW4"
-			(at 193.04 88.9 0)
+			(at 175.26 80.01 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5711,7 +5721,7 @@
 			)
 		)
 		(property "Value" "SKRPACE010"
-			(at 193.04 91.44 0)
+			(at 175.26 82.55 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5721,7 +5731,7 @@
 			)
 		)
 		(property "Footprint" "lcsc_lib:KEY-SMD_4P-L4.2-W3.2-P2.20-LS4.6"
-			(at 193.04 106.68 0)
+			(at 175.26 97.79 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5732,7 +5742,7 @@
 			)
 		)
 		(property "Datasheet" "https://lcsc.com/product-detail/Tactile-Switches_ALPS_SKRPACE010_SKRPACE010_C139797.html"
-			(at 193.04 109.22 0)
+			(at 175.26 100.33 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5743,7 +5753,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 193.04 95.25 0)
+			(at 175.26 86.36 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5754,7 +5764,7 @@
 			)
 		)
 		(property "Manufacturer" "ALPSALPINE(阿尔卑斯阿尔派)"
-			(at 193.04 111.76 0)
+			(at 175.26 102.87 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5765,7 +5775,7 @@
 			)
 		)
 		(property "MPN" "SKRPACE010"
-			(at 193.04 114.3 0)
+			(at 175.26 105.41 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5776,7 +5786,7 @@
 			)
 		)
 		(property "LCSC Part" "C139797"
-			(at 193.04 116.84 0)
+			(at 175.26 107.95 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
