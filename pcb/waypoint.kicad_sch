@@ -6782,6 +6782,16 @@
 	)
 	(wire
 		(pts
+			(xy 190.5 241.3) (xy 199.39 241.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "09aa801a-20ea-4231-8d42-19c3172e0c24")
+	)
+	(wire
+		(pts
 			(xy 365.76 43.18) (xy 365.76 44.45)
 		)
 		(stroke
@@ -7309,6 +7319,16 @@
 			(type default)
 		)
 		(uuid "3c6d1440-aa7e-441e-975f-d70042362053")
+	)
+	(wire
+		(pts
+			(xy 190.5 243.84) (xy 199.39 243.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3c89c6b5-4f14-42a0-884f-a7ee3b585efe")
 	)
 	(wire
 		(pts
@@ -8222,16 +8242,6 @@
 	)
 	(wire
 		(pts
-			(xy 190.5 243.84) (xy 199.39 243.84)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "92c8bc35-923e-4a65-9cf2-c84f7151c677")
-	)
-	(wire
-		(pts
 			(xy 81.28 196.85) (xy 86.36 196.85)
 		)
 		(stroke
@@ -9122,16 +9132,6 @@
 	)
 	(wire
 		(pts
-			(xy 190.5 241.3) (xy 199.39 241.3)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e9af0a7f-e5cb-4af2-a0ae-7d75fb2a96f5")
-	)
-	(wire
-		(pts
 			(xy 179.07 137.16) (xy 198.12 137.16)
 		)
 		(stroke
@@ -9460,6 +9460,16 @@
 		)
 		(uuid "235f2826-320d-4a18-a756-a57fda12c02c")
 	)
+	(label "PGOOD"
+		(at 190.5 243.84 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "23c06d19-7a37-4ab8-8dd7-9af1c63e9b56")
+	)
 	(label "CHG"
 		(at 262.89 25.4 180)
 		(effects
@@ -9479,16 +9489,6 @@
 			(justify left bottom)
 		)
 		(uuid "27407729-f65e-41d7-8a5d-f1a26ba15e3c")
-	)
-	(label "CHG"
-		(at 190.5 243.84 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "27950c25-f3c7-4e2a-89c1-96b5eaacb1bf")
 	)
 	(label "RXD1"
 		(at 24.13 130.81 0)
@@ -9539,6 +9539,16 @@
 			(justify left bottom)
 		)
 		(uuid "3f85f60a-c389-4e3c-a265-573636e276a7")
+	)
+	(label "CHG"
+		(at 190.5 241.3 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "47aee386-e890-4cd3-870a-5b01cb186187")
 	)
 	(label "GNSS_ON"
 		(at 30.48 138.43 0)
@@ -9839,16 +9849,6 @@
 			(justify left bottom)
 		)
 		(uuid "a5a35b21-f8f8-4fc8-a990-234dc99e288f")
-	)
-	(label "PGOOD"
-		(at 190.5 241.3 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "a5f6fe3e-2182-4bd0-903f-7b3025ee9e38")
 	)
 	(label "SCL"
 		(at 133.35 193.04 0)

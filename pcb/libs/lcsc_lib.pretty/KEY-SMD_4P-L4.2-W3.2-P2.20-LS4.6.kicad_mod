@@ -27,7 +27,7 @@
 	(fp_line (start 2.10 -1.60) (end 2.10 1.60) (layer F.CrtYd) (width 0.05))
 	(fp_line (start 2.10 1.60) (end -2.10 1.60) (layer F.CrtYd) (width 0.05))
 	(fp_line (start -2.10 1.60) (end -2.10 -1.60) (layer F.CrtYd) (width 0.05))
-	(model "${KIPRJMOD}/Projects/waypoint/pcb/libs/lcsc_lib.3dshapes/KEY-SMD_4P-L4.2-W3.2-H2.5-LS4.6-P2.2.wrl"
+	(model "${KIPRJMOD}/libs/lcsc_lib.3dshapes/KEY-SMD_4P-L4.2-W3.2-H2.5-LS4.6-P2.2.wrl"
 		(offset (xyz 0.000 0.000 0.000))
 		(scale (xyz 1 1 1))
 		(rotate (xyz 0 0 0))

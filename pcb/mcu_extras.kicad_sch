@@ -27,7 +27,7 @@
 					)
 				)
 			)
-			(property "Value" "Conn_01x04_Pin"
+			(property "Value" "UART"
 				(at 0.635 5.08 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -234,7 +234,7 @@
 				(pin input line
 					(at 5.08 -2.54 180)
 					(length 3.81)
-					(name "RX"
+					(name "TX"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -252,7 +252,7 @@
 				(pin output line
 					(at 5.08 -5.08 180)
 					(length 3.81)
-					(name "TX"
+					(name "RX"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1038,16 +1038,6 @@
 	)
 	(wire
 		(pts
-			(xy 44.45 90.17) (xy 49.53 90.17)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3bc1cdb8-9a38-40bd-9bc4-0a1f6bb92d5e")
-	)
-	(wire
-		(pts
 			(xy 138.43 78.74) (xy 160.02 78.74)
 		)
 		(stroke
@@ -1118,16 +1108,6 @@
 	)
 	(wire
 		(pts
-			(xy 44.45 87.63) (xy 49.53 87.63)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a84530a7-4a36-43c5-ac71-520d940b1399")
-	)
-	(wire
-		(pts
 			(xy 123.19 78.74) (xy 119.38 78.74)
 		)
 		(stroke
@@ -1168,6 +1148,26 @@
 	)
 	(wire
 		(pts
+			(xy 44.45 90.17) (xy 49.53 90.17)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ba2f3c10-e337-487b-b64e-a2a27586eaf9")
+	)
+	(wire
+		(pts
+			(xy 44.45 87.63) (xy 49.53 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c24a5587-8928-4923-a8b6-9bd4c3a63ac3")
+	)
+	(wire
+		(pts
 			(xy 49.53 81.28) (xy 49.53 82.55)
 		)
 		(stroke
@@ -1196,8 +1196,8 @@
 		)
 		(uuid "ed030926-e6fe-4a87-b71c-0bd8ab481903")
 	)
-	(hierarchical_label "TXD0"
-		(shape input)
+	(hierarchical_label "RXD0"
+		(shape output)
 		(at 49.53 90.17 0)
 		(effects
 			(font
@@ -1205,7 +1205,7 @@
 			)
 			(justify left)
 		)
-		(uuid "72e0a36a-27fd-4caa-abc5-875cd91fb54b")
+		(uuid "295d2e6d-bffb-4f62-b903-dc47774de25c")
 	)
 	(hierarchical_label "EN"
 		(shape output)
@@ -1218,8 +1218,8 @@
 		)
 		(uuid "8413908f-a855-4ba5-8420-4cc81ca4a092")
 	)
-	(hierarchical_label "RXD0"
-		(shape output)
+	(hierarchical_label "TXD0"
+		(shape input)
 		(at 49.53 87.63 0)
 		(effects
 			(font
@@ -1227,7 +1227,7 @@
 			)
 			(justify left)
 		)
-		(uuid "fdc83ac0-8477-4dfd-883e-ef826db9fbd0")
+		(uuid "dec06760-f1a8-452a-8a6d-64a241eacb6a")
 	)
 	(symbol
 		(lib_id "power:+3V3")
