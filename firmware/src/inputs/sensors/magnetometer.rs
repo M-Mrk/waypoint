@@ -1,4 +1,4 @@
-use defmt::{info, warn};
+use defmt::{error, info, warn};
 use embassy_time::{Duration, Timer};
 use iis2mdc_rs::blocking::{
     I2CAddress, IIS2MDC_ID, Iis2mdc, from_lsb_to_celsius, from_lsb_to_mgauss,
@@ -27,7 +27,10 @@ pub async fn magnetometer_task(i2c_bus: SharedI2c) {
     match magneto.device_id_get() {
         Ok(id) if id == IIS2MDC_ID => info!("Magnetometer detected: 0x{:x}", id),
         Ok(id) => warn!("Unexpected magnetometer ID: 0x{:x}", id),
-        Err(_) => warn!("Failed to read magnetometer device ID"),
+        Err(_) => {
+            error!("Failed to read magnetometer device ID");
+            return;
+        }
     };
 
     if magneto.data_rate_set(Odr::_10hz).is_err() {

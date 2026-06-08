@@ -33,7 +33,7 @@ pub async fn haptics_task(i2c_bus: SharedI2c) {
     ) {
         Ok(d) => d,
         Err(_) => {
-            error!("Failed to create drv2605l");
+            error!("Failed to initialize haptics");
             return;
         }
     };
@@ -41,7 +41,7 @@ pub async fn haptics_task(i2c_bus: SharedI2c) {
     match drv.calibration() {
         Ok(_) => info!("Calibrated drv2605l"),
         Err(_) => {
-            error!("Failed to calibrate drv2605l");
+            error!("Failed to calibrate haptics");
             return;
         }
     }
@@ -51,7 +51,7 @@ pub async fn haptics_task(i2c_bus: SharedI2c) {
         debug!("Received new HapticsState {}", &state);
         if in_standby && state != HapticsState::Standby {
             if drv.set_standby(false).is_err() {
-                error!("Failed to awake drv2605l");
+                error!("Failed to awake haptics");
                 continue;
             }
             in_standby = false;
@@ -67,7 +67,7 @@ pub async fn haptics_task(i2c_bus: SharedI2c) {
             HapticsState::Standby => {
                 in_standby = true;
                 drv.set_standby(true)
-                    .unwrap_or_else(|_| error!("Failed to put drv2605l to sleep"));
+                    .unwrap_or_else(|_| error!("Failed to put haptics to sleep"));
                 continue;
             }
         };

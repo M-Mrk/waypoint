@@ -6,7 +6,7 @@ use embassy_time::{Duration, Ticker};
 use esp_hal::analog::adc;
 use esp_hal::gpio;
 
-use crate::expander::{CHARGING, POWER_GOOD};
+use crate::inputs::expander::{CHARGING, POWER_GOOD};
 
 pub enum PowerDomain {
     Main,

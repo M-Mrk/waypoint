@@ -20,13 +20,17 @@ use embassy_time::{Duration, Timer};
 use esp_backtrace as _;
 use esp_hal::analog::adc;
 use esp_hal::clock::CpuClock;
-use esp_hal::gpio;
+use esp_hal::gpio::{self, AnyPin};
 use esp_hal::i2c::master as hardware_i2c;
+use esp_hal::rmt;
+use esp_hal::spi;
 use esp_hal::timer::timg::TimerGroup;
 use esp_hal::uart;
 use esp_println as _;
 
 extern crate alloc;
+
+use firmware::{inputs, logic, outputs, power};
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
@@ -126,7 +130,7 @@ async fn main(spawner: Spawner) -> ! {
 
     // IMU
     let imu_i2c = I2cDevice::new(i2c_bus);
-    if let Ok(token) = firmware::sensors::imu::imu_task(imu_i2c) {
+    if let Ok(token) = inputs::sensors::imu::imu_task(imu_i2c) {
         spawner.spawn(token);
     } else {
         error!("Failed to create IMU task");
@@ -134,7 +138,7 @@ async fn main(spawner: Spawner) -> ! {
 
     // Magnetometer
     let mag_i2c = I2cDevice::new(i2c_bus);
-    if let Ok(token) = firmware::sensors::magnetometer::magnetometer_task(mag_i2c) {
+    if let Ok(token) = inputs::sensors::magnetometer::magnetometer_task(mag_i2c) {
         spawner.spawn(token);
     } else {
         error!("Failed to create Magnetometer task")
@@ -142,7 +146,7 @@ async fn main(spawner: Spawner) -> ! {
 
     // Haptics
     let haptic_i2c = I2cDevice::new(i2c_bus);
-    if let Ok(token) = firmware::haptics::haptics_task(haptic_i2c) {
+    if let Ok(token) = outputs::haptics::haptics_task(haptic_i2c) {
         spawner.spawn(token);
     } else {
         error!("Failed to create Haptics task")
@@ -151,7 +155,7 @@ async fn main(spawner: Spawner) -> ! {
     // I/O Expander
     let expander_int_pin = gpio::Input::new(peripherals.GPIO3, gpio::InputConfig::default());
     let expander_i2c = I2cDevice::new(i2c_bus);
-    if let Ok(token) = firmware::expander::expander_task(expander_i2c, expander_int_pin) {
+    if let Ok(token) = inputs::expander::expander_task(expander_i2c, expander_int_pin) {
         spawner.spawn(token);
     } else {
         error!("Failed to create expander interrupt task")
@@ -166,15 +170,54 @@ async fn main(spawner: Spawner) -> ! {
     .with_rx(peripherals.GPIO18)
     .with_tx(peripherals.GPIO19)
     .into_async();
-    if let Ok(token) = firmware::gnss::gnss_task(gnss_uart) {
+
+    if let Ok(token) = inputs::gnss::gnss_task(gnss_uart) {
         spawner.spawn(token);
     } else {
         error!("Failed to create gnss task")
+    }
+
+    // leds
+    let rmt = rmt::Rmt::new(peripherals.RMT, esp_hal::time::Rate::from_mhz(80))
+        .unwrap()
+        .into_async();
+    if let Ok(token) = outputs::leds::leds_task(rmt, peripherals.GPIO23) {
+        spawner.spawn(token);
+    } else {
+        error!("Failed to create led task")
+    }
+
+    // display
+    let spi = spi::master::Spi::new(peripherals.SPI2, spi::master::Config::default())
+        .unwrap()
+        .with_mosi(peripherals.GPIO7)
+        .with_sck(peripherals.GPIO6);
+
+    let cs = gpio::Output::new(
+        peripherals.GPIO20,
+        gpio::Level::Low,
+        gpio::OutputConfig::default(),
+    );
+    let dc = gpio::Output::new(
+        peripherals.GPIO21,
+        gpio::Level::Low,
+        gpio::OutputConfig::default(),
+    );
+    let reset = gpio::Output::new(
+        peripherals.GPIO2,
+        gpio::Level::Low,
+        gpio::OutputConfig::default(),
+    );
+    if let Ok(token) =
+        outputs::display::display_task(spi, cs, dc, reset, peripherals.GPIO22, peripherals.LEDC)
+    {
+        spawner.spawn(token);
+    } else {
+        error!("Failed to create display task")
     }
 
     loop {
         Timer::after(Duration::from_secs(1)).await;
         built_in_led.toggle();
     }
-
 }

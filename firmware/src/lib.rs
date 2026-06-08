@@ -1,10 +1,7 @@
 #![no_std]
-pub mod expander;
-pub mod haptics;
-pub mod sensors;
-
-pub mod gnss;
-
+pub mod inputs;
+pub mod logic;
+pub mod outputs;
 pub mod power;
 
 use embassy_embedded_hal::shared_bus::blocking::i2c::I2cDevice;

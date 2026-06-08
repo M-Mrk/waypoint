@@ -1,4 +1,4 @@
-use defmt::{debug, warn};
+use defmt::{debug, error, warn};
 use embassy_time::{Duration, Timer};
 use lsm6ds3tr::{LSM6DS3TR, interface::I2cInterface};
 
@@ -12,7 +12,8 @@ use crate::SharedI2c;
 pub async fn imu_task(i2c_bus: SharedI2c) {
     let mut imu = LSM6DS3TR::new(I2cInterface::new(i2c_bus));
     if imu.init().is_err() {
-        warn!("Failed to initialize IMU");
+        error!("Failed to initialize IMU");
+        return;
     }
 
     let sender = IMU_WATCH.sender();
