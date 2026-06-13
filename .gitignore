@@ -1,6 +1,7 @@
 # kicad
 pcb/.history/
 pcb/waypoint-backups/
+pcb/production/
 
 # temporary files
 *.bak

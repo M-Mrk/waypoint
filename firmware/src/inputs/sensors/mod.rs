@@ -8,9 +8,9 @@ pub mod magnetometer;
 
 #[derive(Clone, Copy, Debug, Format)]
 pub struct ThreeD {
-    x: f32,
-    y: f32,
-    z: f32,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 impl ThreeD {
     pub fn from_xyz(xyz: XYZ<f32>) -> Self {
@@ -24,15 +24,15 @@ impl ThreeD {
 
 #[derive(Clone, Copy, Debug, Format)]
 pub struct ImuData {
-    acceleration: ThreeD,
-    gyroscope: ThreeD,
-    temperature: f32,
+    pub acceleration: ThreeD,
+    pub gyroscope: ThreeD,
+    pub temperature: f32,
 }
 pub static IMU_WATCH: Watch<CriticalSectionRawMutex, ImuData, 2> = Watch::new();
 
 #[derive(Clone, Copy, Debug, Format)]
 pub struct MagData {
-    magnetic: ThreeD,
-    temperature: f32,
+    pub magnetic: ThreeD,
+    pub temperature: f32,
 }
 pub static MAG_WATCH: Watch<CriticalSectionRawMutex, MagData, 2> = Watch::new();

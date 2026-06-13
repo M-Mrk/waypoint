@@ -12,7 +12,5 @@ static waypoints: Mutex<CriticalSectionRawMutex, WaypointList> = Mutex::new(Vec:
 pub async fn logic_task() {
     // let mut perm_storage = FlashStorage::new(flash);
 
-
-    loop {
-    }
+    loop {}
 }
