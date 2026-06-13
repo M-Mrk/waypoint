@@ -20,7 +20,7 @@ pub enum PowerCommand {
     Sleep,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct BatteryState {
     pub mili_voltage: f32,
     pub percent: u8,

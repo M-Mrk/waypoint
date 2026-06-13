@@ -7,6 +7,7 @@ use embassy_sync::mutex::Mutex;
 use embassy_sync::once_lock::OnceLock;
 use embassy_sync::watch::Watch;
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal};
+use embassy_time::{Duration, Instant};
 use esp_hal::gpio::Input;
 use esp_hal::i2c::master::I2c as HardwareI2c;
 use tca9534_driver_rs::{self as expander, PinConfig, PinLevel};
@@ -122,6 +123,11 @@ fn pin_level_to_bool(level: PinLevel) -> bool {
     }
 }
 
+fn is_debounced(last_trigger: &mut Instant) -> bool {
+    const DEBOUNCE_DELAY: Duration = Duration::from_millis(20);
+    Instant::now() - *last_trigger > DEBOUNCE_DELAY
+}
+
 #[embassy_executor::task]
 pub async fn expander_task(i2c: SharedI2c, mut int_pin: Input<'static>) {
     initialize(i2c).await;
@@ -129,6 +135,11 @@ pub async fn expander_task(i2c: SharedI2c, mut int_pin: Input<'static>) {
     let mutex = EXPANDER_CONFIG.get().await;
     let mut guard = mutex.lock().await;
     let exp_conf = &mut *guard;
+
+    let mut last_left = Instant::now();
+    let mut last_ok = Instant::now();
+    let mut last_right = Instant::now();
+    let mut last_power = Instant::now();
 
     'main: loop {
         match select(int_pin.wait_for_rising_edge(), EXPANDER_CMD.receive()).await {
@@ -156,20 +167,41 @@ pub async fn expander_task(i2c: SharedI2c, mut int_pin: Input<'static>) {
 
                 // Add actions after pin changes here:
                 match (causing_pin, causing_state) {
-                    (Some(pin), Some(state)) => match ExpanderPinMapping::from_u8(pin) {
-                        Some(ExpanderPinMapping::LeftSwitch) => BTN_LEFT.signal(state),
-                        Some(ExpanderPinMapping::OkSwitch) => BTN_OK.signal(state),
-                        Some(ExpanderPinMapping::RightSwitch) => BTN_RIGHT.signal(state),
-                        Some(ExpanderPinMapping::PowerSwitch) => BTN_POWER.signal(state),
-                        Some(ExpanderPinMapping::ImuInit) => IMU_INTERRUPT.signal(state),
-                        Some(ExpanderPinMapping::ChargingIndicator) => {
-                            CHARGING.sender().send(pin_level_to_bool(state))
+                    (Some(pin), Some(state)) => {
+                        let pin = ExpanderPinMapping::from_u8(pin);
+
+                        let last_trigger = match pin {
+                            Some(ExpanderPinMapping::LeftSwitch) => Some(&mut last_left),
+                            Some(ExpanderPinMapping::OkSwitch) => Some(&mut last_ok),
+                            Some(ExpanderPinMapping::RightSwitch) => Some(&mut last_right),
+                            Some(ExpanderPinMapping::PowerSwitch) => Some(&mut last_power),
+                            _ => None,
+                        };
+                        if last_trigger.is_some() {
+                            // needs to be debounced
+                            let last_trigger = last_trigger.unwrap();
+                            if is_debounced(last_trigger) {
+                                *last_trigger = Instant::now(); // Reset debouncing timer
+                            } else {
+                                continue; // Button is bouncing
+                            }
                         }
-                        Some(ExpanderPinMapping::PowerGoodIndicator) => {
-                            POWER_GOOD.sender().send(pin_level_to_bool(state))
+
+                        match pin {
+                            Some(ExpanderPinMapping::LeftSwitch) => BTN_LEFT.signal(state),
+                            Some(ExpanderPinMapping::OkSwitch) => BTN_OK.signal(state),
+                            Some(ExpanderPinMapping::RightSwitch) => BTN_RIGHT.signal(state),
+                            Some(ExpanderPinMapping::PowerSwitch) => BTN_POWER.signal(state),
+                            Some(ExpanderPinMapping::ImuInit) => IMU_INTERRUPT.signal(state),
+                            Some(ExpanderPinMapping::ChargingIndicator) => {
+                                CHARGING.sender().send(pin_level_to_bool(state))
+                            }
+                            Some(ExpanderPinMapping::PowerGoodIndicator) => {
+                                POWER_GOOD.sender().send(pin_level_to_bool(state))
+                            }
+                            _ => {}
                         }
-                        _ => {}
-                    },
+                    }
                     _ => info!("Interrupt triggered but no active low input pin found"),
                 }
             }

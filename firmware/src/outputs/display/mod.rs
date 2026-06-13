@@ -1,14 +1,22 @@
 use defmt::error;
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, watch::Watch};
-use embedded_graphics::{pixelcolor::Rgb565, prelude::*};
-use embedded_graphics_framebuf::FrameBuf;
 use embedded_hal_bus::spi::ExclusiveDevice;
 use esp_hal::gpio;
 use esp_hal::time::Rate;
 use esp_hal::{Blocking, spi};
+use heapless::{String, format};
+use static_cell::StaticCell;
+
+use embedded_graphics::{
+    mono_font,
+    pixelcolor::Rgb565,
+    prelude::*,
+    primitives,
+    text::{Alignment, Text},
+};
+use embedded_graphics_framebuf::FrameBuf;
 use mipidsi::interface::SpiInterface;
 use mipidsi::{Builder, models::GC9A01}; // Provides the builder for Display
-use static_cell::StaticCell;
 
 use esp_hal::ledc::{
     LSGlobalClkSource, Ledc, LowSpeed,
@@ -16,7 +24,7 @@ use esp_hal::ledc::{
     timer::{self, TimerIFace},
 };
 
-use crate::power::BATTERY_WATCH;
+use crate::power::BatteryState;
 
 type DisplayDriver = mipidsi::Display<
     SpiInterface<
@@ -37,14 +45,16 @@ type FrameBuffer = FrameBuf<Rgb565, &'static mut FbData>;
 type FbData = [Rgb565; 240 * 240];
 static FB: StaticCell<FbData> = StaticCell::new();
 
-#[derive(Clone, Copy, PartialEq)]
+mod main_page;
+mod navigate_page;
+
+#[derive(Clone, PartialEq)]
 pub enum DisplayState {
-    MainPage,
+    MainPage(main_page::State),
+    Navigation(navigate_page::State),
 }
 
 pub static DISPLAY_STATE: Watch<CriticalSectionRawMutex, DisplayState, 2> = Watch::new();
-
-mod main_page;
 
 #[embassy_executor::task]
 pub async fn display_task(
@@ -114,15 +124,84 @@ pub async fn display_task(
         fb.clear(Rgb565::BLACK);
 
         match new_state {
-            DisplayState::MainPage => {
-                let battery_state = BATTERY_WATCH.try_get().unwrap();
-                let values = main_page::State {
-                    bat_percent: battery_state.percent,
-                    charging: battery_state.charging,
-                    current_item: main_page::Item::Navigation,
-                };
-                main_page::draw(&mut fb, &values).await;
+            DisplayState::MainPage(state) => {
+                main_page::draw(&mut fb, &state).await;
+            }
+            DisplayState::Navigation(state) => {
+                navigate_page::draw(&mut fb, &state).await;
             }
         }
     }
+}
+
+pub fn map(x: u32, in_min: u32, in_max: u32, out_min: u32, out_max: u32) -> u32 {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+pub fn battery(display: &mut FrameBuffer, state: &BatteryState) -> Result<(), ()> {
+    // Battery
+    const BAT_LEFT_X: i32 = 41;
+    const BAT_HEIGHT: i32 = 30;
+    let text_style =
+        mono_font::MonoTextStyle::new(&mono_font::ascii::FONT_9X15_BOLD, Rgb565::WHITE);
+    const HALF_TEXT_HEIGHT: i32 = 5;
+
+    // background
+    primitives::Rectangle::new(
+        Point {
+            x: BAT_LEFT_X,
+            y: 0,
+        },
+        Size {
+            width: (240 - (BAT_LEFT_X * 2)) as u32,
+            height: BAT_HEIGHT as u32,
+        },
+    )
+    .into_styled(primitives::PrimitiveStyle::with_fill(Rgb565::CSS_GRAY))
+    .draw(display);
+
+    // bar
+    let percent: String<5> = format!("{}%", state.percent).unwrap();
+    let charge_width = map(
+        state.percent as u32,
+        0,
+        100,
+        0,
+        (240 - BAT_LEFT_X * 2) as u32,
+    );
+    let mut color = match state.percent {
+        low if low < 15 => Rgb565::CSS_RED,
+        _ => Rgb565::CSS_DARK_SEA_GREEN,
+    };
+    if state.charging {
+        color = Rgb565::CSS_GOLDENROD;
+    }
+
+    primitives::Rectangle::new(
+        Point {
+            x: BAT_LEFT_X,
+            y: 0,
+        },
+        Size {
+            width: charge_width,
+            height: BAT_HEIGHT as u32,
+        },
+    )
+    .into_styled(primitives::PrimitiveStyle::with_fill(color))
+    .draw(display)
+    .map_err(|_| ())?;
+
+    Text::with_alignment(
+        &percent,
+        Point {
+            x: 120,
+            y: (BAT_HEIGHT / 2 + HALF_TEXT_HEIGHT),
+        },
+        text_style,
+        Alignment::Center,
+    )
+    .draw(display)
+    .map_err(|_| ())?;
+
+    Ok(())
 }

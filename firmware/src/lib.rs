@@ -1,6 +1,7 @@
 #![no_std]
 pub mod inputs;
 pub mod logic;
+pub mod navigation;
 pub mod outputs;
 pub mod power;
 

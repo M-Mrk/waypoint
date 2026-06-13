@@ -20,7 +20,7 @@ use embassy_time::{Duration, Timer};
 use esp_backtrace as _;
 use esp_hal::analog::adc;
 use esp_hal::clock::CpuClock;
-use esp_hal::gpio::{self, AnyPin};
+use esp_hal::gpio;
 use esp_hal::i2c::master as hardware_i2c;
 use esp_hal::rmt;
 use esp_hal::spi;

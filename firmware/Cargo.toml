@@ -51,6 +51,9 @@ display-interface-spi = "0.5.0"
 embedded-hal-bus = { version = "0.3.0", features = ["defmt-03"] }
 embedded-graphics-framebuf = "0.5.0"
 tinybmp = "0.7.0"
+profont = "0.7.0"
+libm = "0.2.16"
+esp-storage = { version = "0.9.0", features = ["esp32c6"] }
 
 
 # For fine tuning these settings, please refer to https://doc.rust-lang.org/cargo/reference/profiles.html
@@ -58,6 +61,9 @@ tinybmp = "0.7.0"
 # The default debug profile is too slow and too big for resource-constrained devices.
 # Always build with some optimizations enabled.
 opt-level = "s"
+
+[profile.dev.package.esp-storage]
+opt-level = 3
 
 [profile.release]
 codegen-units = 1 # LLVM can perform better optimizations using a single thread

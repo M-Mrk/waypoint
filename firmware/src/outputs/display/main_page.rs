@@ -1,38 +1,35 @@
 use defmt::error;
-use heapless::{String, format};
+
+use crate::power::BatteryState;
 
 use super::FrameBuffer;
 use embedded_graphics::{
+    image::Image,
     mono_font::MonoTextStyle,
     mono_font::ascii::FONT_9X15_BOLD,
     pixelcolor::Rgb565,
     prelude::*,
-    primitives::{Line, PrimitiveStyle, Rectangle},
+    primitives::{Line, PrimitiveStyle},
     text::{Alignment, Text},
-    image::Image,
 };
 use tinybmp::Bmp;
 
-#[derive(Clone, Copy)]
+use super::battery;
+#[derive(Clone, Copy, PartialEq)]
 pub enum Item {
     Navigation,
     Waypoints,
     Settings,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct State {
     pub current_item: Item,
-    pub bat_percent: u8,
-    pub charging: bool,
-}
-
-fn map(x: u32, in_min: u32, in_max: u32, out_min: u32, out_max: u32) -> u32 {
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    pub battery: BatteryState,
 }
 
 pub async fn draw(display: &mut FrameBuffer, state: &State) {
-    if battery(display, state).is_err() {
+    if battery(display, &state.battery).is_err() {
         error!("Failed to draw battery")
     }
     if arrows(display).is_err() {
@@ -41,73 +38,6 @@ pub async fn draw(display: &mut FrameBuffer, state: &State) {
     if item(display, state).is_err() {
         error!("Failed to draw item")
     }
-}
-
-fn battery(display: &mut FrameBuffer, state: &State) -> Result<(), ()> {
-    // Battery
-    const BAT_LEFT_X: i32 = 41;
-    const BAT_HEIGHT: i32 = 30;
-    let text_style = MonoTextStyle::new(&FONT_9X15_BOLD, Rgb565::WHITE);
-    const HALF_TEXT_HEIGHT: i32 = 5;
-
-    // background
-    Rectangle::new(
-        Point {
-            x: BAT_LEFT_X,
-            y: 0,
-        },
-        Size {
-            width: (240 - (BAT_LEFT_X * 2)) as u32,
-            height: BAT_HEIGHT as u32,
-        },
-    )
-    .into_styled(PrimitiveStyle::with_fill(Rgb565::CSS_GRAY))
-    .draw(display);
-
-    // bar
-    let percent: String<5> = format!("{}%", state.bat_percent).unwrap();
-    let charge_width = map(
-        state.bat_percent as u32,
-        0,
-        100,
-        0,
-        (240 - BAT_LEFT_X * 2) as u32,
-    );
-    let mut color = match state.bat_percent {
-        low if low < 15 => Rgb565::CSS_RED,
-        _ => Rgb565::CSS_DARK_SEA_GREEN,
-    };
-    if state.charging {
-        color = Rgb565::CSS_GOLDENROD;
-    }
-
-    Rectangle::new(
-        Point {
-            x: BAT_LEFT_X,
-            y: 0,
-        },
-        Size {
-            width: charge_width,
-            height: BAT_HEIGHT as u32,
-        },
-    )
-    .into_styled(PrimitiveStyle::with_fill(color))
-    .draw(display)
-    .map_err(|_| ())?;
-
-    Text::with_alignment(
-        &percent,
-        Point {
-            x: 120,
-            y: (BAT_HEIGHT / 2 + HALF_TEXT_HEIGHT),
-        },
-        text_style,
-        Alignment::Center,
-    )
-    .draw(display)
-    .map_err(|_| ())?;
-
-    Ok(())
 }
 
 fn arrows(display: &mut FrameBuffer) -> Result<(), ()> {
@@ -175,17 +105,11 @@ fn arrows(display: &mut FrameBuffer) -> Result<(), ()> {
 
 fn item(display: &mut FrameBuffer, state: &State) -> Result<(), ()> {
     let text_style = MonoTextStyle::new(&FONT_9X15_BOLD, Rgb565::WHITE);
-    
+
     let (bmp_data, name) = match state.current_item {
-        Item::Navigation => {
-            (include_bytes!("../../../img/navigate.bmp"), "Navigate")
-        },
-        Item::Settings => {
-            (include_bytes!("../../../img/cog.bmp"), "Settings")
-        },
-        Item::Waypoints => {
-            (include_bytes!("../../../img/flag.bmp"), "Waypoints")
-        },
+        Item::Navigation => (include_bytes!("../../../img/navigate.bmp"), "Navigate"),
+        Item::Settings => (include_bytes!("../../../img/cog.bmp"), "Settings"),
+        Item::Waypoints => (include_bytes!("../../../img/flag.bmp"), "Waypoints"),
     };
 
     let bmp = Bmp::from_slice(bmp_data).unwrap();
@@ -198,7 +122,8 @@ fn item(display: &mut FrameBuffer, state: &State) -> Result<(), ()> {
         text_style,
         Alignment::Center,
     )
-    .draw(display).map_err(|_|())?;
-    
+    .draw(display)
+    .map_err(|_| ())?;
+
     Ok(())
 }
