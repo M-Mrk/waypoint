@@ -11241,7 +11241,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.lcsc.com/datasheet/C2942349.pdf"
+		(property "Datasheet" "https://jlc-prod-smt.oss-eu-central-1.aliyuncs.com/smtDataManualFile/8590221553297494016-C2942349.pdf?response-content-disposition=attachment%3B%20filename%3DC2942349.pdf%3B%20filename%2A%3DUTF-8%27%27C2942349.pdf&x-oss-date=20260614T140156Z&x-oss-expires=1800&x-oss-security-token=CAISgAN1q6Ft5B2yfSjIr5nWMYnzr5lO0pO%2FVnTyijdgQL1Y2rDpuzz2IHhMdHJsAOodtv0%2FmmhT6PkclqRLcbhpcmfjV%2BZHzLB8qcss6ldF4J7b16cNrbH4M4H6aXeirtuwDsz9SNTCALjPD3nPii50x5bjaDymRCbLGJaViJlhHLN1Ow6jdmhpCctxLAlvo9NgFxm3D%2Fu2NQPwiWf9FVdhvhEG6Vly8qOi2MaRmFy8yFTx0b0SvJ%2BjYMrmPctoN9JnSdC5mfdzau3a1TJ84gRD0a5wkaVA1zbDs5bfISEIuUzebreLqY03dV4mOvdqIcMe8qigz88fk%2FfIioH6xyxKOexoSCnFTOiiupCcQLPyao9jLu6iayqViY7QaIOTqQohZmkAMwVOasAsI3Ngh4zF97Qt0cVNkXO9gWfLI8DtuMleWqqt3egmonSgc5lCkRRYwGs1287ugXlSQzo890KPDAEovaKCnZ2ZSfh7Y4sNknI6i%2Bfc2Se2MIkIVScpNqKWD5sagAFXwFmQOSZgtjhceNBtsw%2Bx0i1C7Vgdzt7QPSXXkHwnPHZeTWTXwkiT1va1jn1duTufqQa10bsVlW4Xe%2FyWGkuTeORy03DdH1Il3iH3GhsPuHj1TU5MI%2Bw9O3jgUnEB5OswFzKuiZnQQGOvhmvnexxJKOtjBdjsfaUt79l7jpHMLyAA&x-oss-signature-version=OSS4-HMAC-SHA256&x-oss-credential=STS.NZcz3GBFoeQTTRCn75L2t5uBY%2F20260614%2Feu-central-1%2Foss%2Faliyun_v4_request&x-oss-signature=dc315c2ee2c577a4f7974fa9ffdee7d48206a1ea1ec8a21542a77ad322a9612d"
 			(at 374.65 34.29 0)
 			(hide yes)
 			(show_name no)

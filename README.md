@@ -3,7 +3,7 @@
 # Waypoint
 A handheld GNSS navigation device designed to help you to get to a destination without relying on mobile reception.
 
-Ever wanted to get somewhere from anywhere? Waypoint uses GNSS to guide you towards your destination by showing the direction, distance, and elevation difference. It does not provide turn-by-turn routes, but instead gives you the all other needed information to navigate independently.
+Ever wanted to get somewhere from anywhere? Waypoint uses GNSS to guide you towards your destination by showing the direction, distance, and elevation difference. It does not provide turn-by-turn routes, but instead gives you all the other needed informations to navigate independently.
 
 It is powered by a 3200mAh LiPo battery, an efficient MCU, and separated power domains to achieve long battery life.
 
@@ -31,7 +31,7 @@ With this project I learned a lot about embedded Rust with the embassy framework
 
 # Pictures
 ## Full assembly
-TODO: add image
+![case](images/case.png)
 
 ## PCB
 ![pcb](images/pcb.png)
@@ -47,10 +47,62 @@ Order all components from the [bom](bom.csv) from your prefered site. It already
 Start by soldering all smd components, then do all the tht ones.
 
 ## Case
-Print all .3mf files in [here](case/printable). Printing the top and bottom in different colors gives it a nice touch! See the example images for inspiration.
+Print all .3mf files in [here](case/printables/). Printing the top and bottom in different colors gives it a nice touch! See the example images for inspiration.
+
+## Flashing
+Get the firmware file from [releases](https://github.com/M-Mrk/waypoint/releases). Flash it with ur prefered esp flashing tool over the usb port or the exposed uart. You can use espflash or [espressifs web tool](https://espressif.github.io/esptool-js/)
 
 ## Assembly
 - Stick the battery in the bottom of the case and connected it to the pcb (please make sure that the batteries polarity matches the pcbs)
 - Press the pcb into the bottom. Align it with the posts
 - The top requires some force to press on, as it uses snap fits. If there is too much friction sand the lip a bit down.
 - Done
+
+# BOM
+|Reference                                                                                               |Qty|Value                   |Footprint                                 |LCSC Part|MOQ|Unit price (€)|Total price (€)|Link                                                |
+|--------------------------------------------------------------------------------------------------------|---|------------------------|------------------------------------------|---------|---|--------------|---------------|----------------------------------------------------|
+|C1;C2;C3;C15;C38;C43;C44;C45                                                                            |8  |1uF                     |Capacitor_SMD:C_0603_1608Metric           |C19702   |20 |0.0154        |0.31           |https://lcsc.com/product-detail/C19702.html         |
+|C4;C47;C48                                                                                              |3  |22uF                    |Capacitor_SMD:C_0603_1608Metric           |C86295   |10 |0.0283        |0.28           |https://lcsc.com/product-detail/C86295.html         |
+|C5;C8;C9;C10;C11;C12;C16;C17;C18;C19;C21;C22;C23;C24;C25;C26;C27;C28;C29;C30;C31;C32;C33;C34;C35;C36;C37|27 |100nF                   |Capacitor_SMD:C_0603_1608Metric           |C143640  |100|0.0062        |0.62           |https://lcsc.com/product-detail/C143640.html        |
+|C13;C46                                                                                                 |2  |10uF                    |Capacitor_SMD:C_0603_1608Metric           |C96446   |20 |0.0472        |0.94           |https://lcsc.com/product-detail/C96446.html         |
+|C14                                                                                                     |1  |220nF                   |Capacitor_SMD:C_0603_1608Metric           |C107083  |50 |0.0119        |0.6            |https://lcsc.com/product-detail/C107083.html        |
+|C20                                                                                                     |1  |100uF                   |Capacitor_SMD:C_1210_3225Metric           |C7432790 |1  |0.3025        |0.3            |https://lcsc.com/product-detail/C7432790.html       |
+|C39;C41;C42                                                                                             |3  |4.7uF                   |Capacitor_SMD:C_0603_1608Metric           |C19666   |10 |0.0192        |0.19           |https://lcsc.com/product-detail/C19666.html         |
+|C40                                                                                                     |1  |2.2uF                   |Capacitor_SMD:C_0805_2012Metric           |C19110   |10 |0.0203        |0.2            |https://lcsc.com/product-detail/C19110.html         |
+|D1;D2;D3                                                                                                |3  |BAT54X                  |lcsc_lib:SOD-523_L1.2-W0.8-LS1.6-RD       |C51315114|50 |0.0040        |0.2            |https://lcsc.com/product-detail/C51315114.html      |
+|L1                                                                                                      |1  |KH-GPS252504-WY         |lcsc_lib:ANT-TH_KH-GPS252504-WY           |C962216  |1  |0.9211        |0.92           |https://lcsc.com/product-detail/C962216.html        |
+|L2                                                                                                      |1  |47nH                    |Inductor_SMD:L_0603_1608Metric            |C6807998 |20 |0.0336        |0.67           |https://lcsc.com/product-detail/C6807998.html       |
+|L3;L4                                                                                                   |2  |1uH                     |Inductor_SMD:L_1008_2520Metric            |C5179444 |10 |0.0578        |0.58           |https://lcsc.com/product-detail/C5179444.html       |
+|M1                                                                                                      |1  |LD0832AA-0126F          |lcsc_lib:MD-SMD_2P-LD0832AA-0126F         |C2942349 |1  |1.4234        |1.42           |https://lcsc.com/product-detail/C2942349.html       |
+|R1;R4                                                                                                   |2  |5.1kR                   |Resistor_SMD:R_0603_1608Metric            |C2907114 |100|0.0013        |0.13           |https://lcsc.com/product-detail/C2907114.html       |
+|R2;R5;R6;R7;R12;R13;R18;R19;R21                                                                         |9  |10kR                    |Resistor_SMD:R_0603_1608Metric            |C2930027 |100|0.0013        |0.13           |https://lcsc.com/product-detail/C2930027.html       |
+|R3                                                                                                      |1  |30kR                    |Resistor_SMD:R_0603_1608Metric            |C2907025 |100|0.0015        |0.15           |https://lcsc.com/product-detail/C2907025.html       |
+|R8;R9                                                                                                   |2  |22R                     |Resistor_SMD:R_0603_1608Metric            |C2907129 |100|0.0013        |0.13           |https://lcsc.com/product-detail/C2907129.html       |
+|R10;R11                                                                                                 |2  |2.2kR                   |Resistor_SMD:R_0603_1608Metric            |C2907005 |100|0.0014        |0.14           |https://lcsc.com/product-detail/C2907005.html       |
+|R14;R15                                                                                                 |2  |510R                    |Resistor_SMD:R_0603_1608Metric            |C2907179 |100|0.0013        |0.13           |https://lcsc.com/product-detail/C2907179.html       |
+|R16                                                                                                     |1  |1.2kR                   |Resistor_SMD:R_0603_1608Metric            |C2907081 |100|0.0012        |0.12           |https://lcsc.com/product-detail/C2907081.html       |
+|R17                                                                                                     |1  |1.96kR                  |Resistor_SMD:R_0603_1608Metric            |C2998107 |100|0.0013        |0.13           |https://lcsc.com/product-detail/C2998107.html       |
+|R20;R22;R23;R25;R26                                                                                     |5  |100kR                   |Resistor_SMD:R_0603_1608Metric            |C2906980 |100|0.0014        |0.14           |https://lcsc.com/product-detail/C2906980.html       |
+|R24                                                                                                     |1  |732kR                   |Resistor_SMD:R_0603_1608Metric            |C2849083 |5  |0.0710        |0.36           |https://lcsc.com/product-detail/C2849083.html       |
+|SW1                                                                                                     |1  |Nav buttons             |lcsc_lib:SW-SMD_L6.0-W6.0-LS6.6           |C49174518|5  |0.0671        |0.34           |https://lcsc.com/product-detail/C49174518.html      |
+|SW4                                                                                                     |1  |SKRPACE010              |lcsc_lib:KEY-SMD_4P-L4.2-W3.2-P2.20-LS4.6 |C139797  |10 |0.0549        |0.55           |https://lcsc.com/product-detail/C139797.html        |
+|U1                                                                                                      |1  |BX-PH2.0-2PWZ           |lcsc_lib:CONN-TH_2P-P2.00_BX-PH2.0-2PWZ   |C18077753|50 |0.0085        |0.43           |https://lcsc.com/product-detail/C18077753.html      |
+|U2                                                                                                      |1  |GT-USB-7010ASV          |lcsc_lib:USB-C-SMD_G-SWITCH_GT-USB-7010ASV|C2988369 |5  |0.0773        |0.39           |https://lcsc.com/product-detail/C2988369.html       |
+|U3                                                                                                      |1  |USBLC6-2SC6_C5261088    |lcsc_lib:SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BR|C5261088 |5  |0.0339        |0.17           |https://lcsc.com/product-detail/C5261088.html       |
+|U4                                                                                                      |1  |DRV2605LDGST            |lcsc_lib:VSSOP-10_L3.0-W3.0-P0.50-LS4.9-BL|C425927  |1  |1.1835        |1.18           |https://lcsc.com/product-detail/C425927.html        |
+|U5                                                                                                      |1  |ESP32-C6-WROOM-1-N8     |lcsc_lib:WIRELM-SMD_ESP32-C6-WROOM-1      |C5366877 |1  |3.8269        |3.83           |https://lcsc.com/product-detail/C5366877.html       |
+|U6                                                                                                      |1  |240x240 SPI             |aliexpress:GC9A01                         |         |1  |3.29          |3.29           |https://de.aliexpress.com/item/1005010527932589.html|
+|U7                                                                                                      |1  |ATGM336H-5NR-32         |lcsc_lib:GPS-SMD_18P-L10.1-W9.7-P1.10-TL  |C5117921 |1  |1.7764        |1.78           |https://lcsc.com/product-detail/C5117921.html       |
+|U8                                                                                                      |1  |LSM6DS3TR-C             |lcsc_lib:LGA-14_L3.0-W2.5-P0.50-TL        |C967633  |1  |1.3916        |1.39           |https://lcsc.com/product-detail/C967633.html        |
+|U9                                                                                                      |1  |IIS2MDCTR               |lcsc_lib:LGA-12_L2.0-W2.0-P0.50-TL        |C2655002 |1  |2.7994        |2.8            |https://lcsc.com/product-detail/C2655002.html       |
+|U10                                                                                                     |1  |TCA9534PWR              |lcsc_lib:TSSOP-16_L5.0-W4.4-P0.65-LS6.4-BL|C783615  |1  |0.6794        |0.68           |https://lcsc.com/product-detail/C783615.html        |
+|U11;U12;U13;U15;U16;U17;U18;U19;U20;U21;U22;U23;U24;U25;U26;U27;U28;U29;U30;U31                         |20 |SK6812MINI-FA           |lcsc_lib:LED-SMD_SK6812MINI-FA            |C7423121 |10 |0.0633        |1.27           |https://lcsc.com/product-detail/C7423121.html       |
+|U14                                                                                                     |1  |SN74LV1T34DCKR_C48543212|lcsc_lib:SC-70-5_L2.1-W1.3-P0.65-LS2.1-BR |C48543212|5  |0.0573        |0.29           |https://lcsc.com/product-detail/C48543212.html      |
+|U32                                                                                                     |1  |TPS62237DRYR            |lcsc_lib:SON-6_L1.5-W1.0-P0.50-BL         |C398923  |1  |0.7050        |0.71           |https://lcsc.com/product-detail/C398923.html        |
+|U33                                                                                                     |1  |BQ24073RGTR             |lcsc_lib:QFN-16_L3.0-W3.0-P0.50-TL-EP1.7  |C15220   |1  |0.6966        |0.7            |https://lcsc.com/product-detail/C15220.html         |
+|U34                                                                                                     |1  |LP5907MFX-3.3/NOPB      |lcsc_lib:SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BR|C80670   |5  |0.1446        |0.72           |https://lcsc.com/product-detail/C80670.html         |
+|U35                                                                                                     |1  |TPS3840DL35DBVR         |lcsc_lib:SOT-23-5_L2.9-W1.6-P0.95-LS2.8-BR|C2866251 |1  |0.5365        |0.54           |https://lcsc.com/product-detail/C2866251.html       |
+|U36                                                                                                     |1  |TPS61023DRLR            |lcsc_lib:SOT-563_L1.6-W1.2-P0.50-LS1.6-BR |C919459  |5  |0.2357        |1.18           |https://lcsc.com/product-detail/C919459.html        |
+|PCB                                                                                                     |1  |JLC 1.6mm 4-Layers      |                                          |         |5  |5.37          |26.85          |https://cart.jlcpcb.com/quote                       |
+|Stencil                                                                                                 |1  |Default                 |                                          |         |1  |6.18          |6.18           |https://cart.jlcpcb.com/quote                       |
+Total (w/o shipping): 64.06€
