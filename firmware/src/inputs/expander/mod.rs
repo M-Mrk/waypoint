@@ -20,7 +20,7 @@ static EXPANDER_CONFIG: OnceLock<Mutex<CriticalSectionRawMutex, CurrentConfig>> 
 
 const NUM_PINS: usize = 8;
 #[repr(u8)]
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum ExpanderPinMapping {
     ChargingIndicator = 0,
     PowerGoodIndicator = 1,
@@ -53,6 +53,18 @@ impl ExpanderPinMapping {
     pub fn as_usize(self) -> usize {
         return self as usize;
     }
+
+    pub fn as_button_type(self) -> ButtonType {
+        match self {
+            Self::LeftSwitch => ButtonType::Left,
+            Self::OkSwitch => ButtonType::Ok,
+            Self::RightSwitch => ButtonType::Right,
+            Self::PowerSwitch => ButtonType::Power,
+            _ => {
+                panic!("Unable to convert self to ButtonType: {:?}", self)
+            }
+        }
+    }
 }
 
 pub struct CurrentConfig {
@@ -60,12 +72,31 @@ pub struct CurrentConfig {
     expander: ExpanderDevice,
 }
 
-pub static BTN_LEFT: Signal<CriticalSectionRawMutex, PinLevel> = Signal::new();
-pub static BTN_OK: Signal<CriticalSectionRawMutex, PinLevel> = Signal::new();
-pub static BTN_RIGHT: Signal<CriticalSectionRawMutex, PinLevel> = Signal::new();
-pub static BTN_POWER: Signal<CriticalSectionRawMutex, PinLevel> = Signal::new();
-pub static IMU_INTERRUPT: Signal<CriticalSectionRawMutex, PinLevel> = Signal::new();
+#[derive(Clone, Copy)]
+pub enum ButtonType {
+    // TODO: implement these
+    Left,
+    Ok,
+    Right,
+    Power,
+}
 
+#[derive(Clone, Copy)]
+pub enum ButtonAction {
+    Single,
+    Double,
+    Long,
+}
+
+#[derive(Clone, Copy)]
+pub struct ButtonCall {
+    pub function: ButtonType,
+    pub action: ButtonAction,
+}
+
+pub static BTNS: Signal<CriticalSectionRawMutex, ButtonCall> = Signal::new();
+
+pub static IMU_INTERRUPT: Signal<CriticalSectionRawMutex, PinLevel> = Signal::new();
 pub static CHARGING: Watch<CriticalSectionRawMutex, bool, 3> = Watch::new();
 pub static POWER_GOOD: Watch<CriticalSectionRawMutex, bool, 3> = Watch::new();
 
@@ -165,16 +196,21 @@ pub async fn expander_task(i2c: SharedI2c, mut int_pin: Input<'static>) {
                     }
                 }
 
-                // Add actions after pin changes here:
                 match (causing_pin, causing_state) {
                     (Some(pin), Some(state)) => {
-                        let pin = ExpanderPinMapping::from_u8(pin);
+                        let pin = match ExpanderPinMapping::from_u8(pin) {
+                            Some(n) => n,
+                            None => {
+                                error!("Impossible causing pin reached");
+                                continue;
+                            }
+                        };
 
                         let last_trigger = match pin {
-                            Some(ExpanderPinMapping::LeftSwitch) => Some(&mut last_left),
-                            Some(ExpanderPinMapping::OkSwitch) => Some(&mut last_ok),
-                            Some(ExpanderPinMapping::RightSwitch) => Some(&mut last_right),
-                            Some(ExpanderPinMapping::PowerSwitch) => Some(&mut last_power),
+                            ExpanderPinMapping::LeftSwitch => Some(&mut last_left),
+                            ExpanderPinMapping::OkSwitch => Some(&mut last_ok),
+                            ExpanderPinMapping::RightSwitch => Some(&mut last_right),
+                            ExpanderPinMapping::PowerSwitch => Some(&mut last_power),
                             _ => None,
                         };
                         if last_trigger.is_some() {
@@ -186,21 +222,28 @@ pub async fn expander_task(i2c: SharedI2c, mut int_pin: Input<'static>) {
                                 continue; // Button is bouncing
                             }
                         }
-
                         match pin {
-                            Some(ExpanderPinMapping::LeftSwitch) => BTN_LEFT.signal(state),
-                            Some(ExpanderPinMapping::OkSwitch) => BTN_OK.signal(state),
-                            Some(ExpanderPinMapping::RightSwitch) => BTN_RIGHT.signal(state),
-                            Some(ExpanderPinMapping::PowerSwitch) => BTN_POWER.signal(state),
-                            Some(ExpanderPinMapping::ImuInit) => IMU_INTERRUPT.signal(state),
-                            Some(ExpanderPinMapping::ChargingIndicator) => {
-                                CHARGING.sender().send(pin_level_to_bool(state))
+                            ExpanderPinMapping::ImuInit => IMU_INTERRUPT.signal(state),
+                            ExpanderPinMapping::ChargingIndicator => {
+                                CHARGING.sender().send(pin_level_to_bool(state));
+                                continue;
                             }
-                            Some(ExpanderPinMapping::PowerGoodIndicator) => {
-                                POWER_GOOD.sender().send(pin_level_to_bool(state))
+                            ExpanderPinMapping::PowerGoodIndicator => {
+                                POWER_GOOD.sender().send(pin_level_to_bool(state));
+                                continue;
                             }
                             _ => {}
                         }
+
+                        // Only buttons from here on
+                        if state == PinLevel::Low {
+                            continue; // Don't care about buttons stop being pressed
+                        }
+                        let button_type = pin.as_button_type();
+                        BTNS.signal(ButtonCall {
+                            function: button_type,
+                            action: ButtonAction::Single,
+                        });
                     }
                     _ => info!("Interrupt triggered but no active low input pin found"),
                 }

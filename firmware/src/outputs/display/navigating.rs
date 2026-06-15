@@ -10,7 +10,8 @@ use embedded_graphics::{
 };
 use profont::{PROFONT_12_POINT, PROFONT_18_POINT, PROFONT_24_POINT};
 
-use super::{FrameBuffer, battery};
+use super::widgets::battery;
+use super::{FrameBuffer};
 
 #[derive(Clone, PartialEq)]
 pub struct State {

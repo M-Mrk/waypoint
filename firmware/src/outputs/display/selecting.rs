@@ -14,7 +14,8 @@ use embedded_graphics::{
 };
 use tinybmp::Bmp;
 
-use super::battery;
+use super::widgets::battery;
+
 #[derive(Clone, Copy, PartialEq)]
 pub enum Item {
     Navigation,
