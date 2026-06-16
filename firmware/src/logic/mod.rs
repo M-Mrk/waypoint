@@ -1,26 +1,17 @@
-use defmt::{Format, error, info, warn};
+use defmt::{Format, info};
 use embassy_futures::select::{Either4, select4};
-use embassy_sync::blocking_mutex::{CriticalSectionMutex, Mutex, raw::CriticalSectionRawMutex};
-use esp_storage::FlashStorage;
-use heapless::Vec;
 
-use crate::{
-    inputs::{
-        expander::{BTNS, ButtonCall},
-        gnss::{GNSS_WATCH, GnssData},
-        sensors::{IMU_WATCH, ImuData, MAG_WATCH, MagData},
-    },
-    navigation::Waypoint,
+use crate::inputs::{
+    expander::{BTNS, ButtonCall},
+    gnss::{GNSS_WATCH, GnssData},
+    sensors::{IMU_WATCH, ImuData, MAG_WATCH, MagData},
 };
 
-mod sleep;
-mod selecting;
 mod navigating;
+mod selecting;
 mod settings;
-
-pub type WaypointList = heapless::Vec<Waypoint, 12>;
-
-static WAYPOINTS: Mutex<CriticalSectionRawMutex, WaypointList> = Mutex::new(Vec::new());
+mod sleep;
+mod waypoints;
 
 #[derive(Format, Clone, Copy)]
 enum AppState {
@@ -28,18 +19,34 @@ enum AppState {
     Selecting,
     Navigating,
     Settings,
+    Waypoints,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Format, Clone, Copy)]
+struct Inputs {
+    pub button: Option<ButtonCall>,
+    pub imu: Option<ImuData>,
+    pub magn: Option<MagData>,
+    pub gnss: Option<GnssData>,
+}
+impl Inputs {
+    pub fn none() -> Self {
+        Self {
+            button: None,
+            imu: None,
+            magn: None,
+            gnss: None,
+        }
+    }
+}
+
+#[derive(Format, Clone, Copy)]
 struct App {
     pub current: AppState,
     pub last: AppState,
     pub changed: bool,
 
-    pub button_call: Option<ButtonCall>,
-    pub imu: Option<ImuData>,
-    pub magn: Option<MagData>,
-    pub gnss: Option<GnssData>,
+    pub inputs: Inputs,
 }
 impl App {
     pub fn new() -> Self {
@@ -48,18 +55,12 @@ impl App {
             last: AppState::Sleep,
             changed: true,
 
-            button_call: None,
-            imu: None,
-            magn: None,
-            gnss: None,
+            inputs: Inputs::none(),
         }
     }
 
     pub fn clear_updates(&mut self) {
-        self.button_call = None;
-        self.imu = None;
-        self.magn = None;
-        self.gnss = None;
+        self.inputs = Inputs::none();
     }
 
     pub fn set_state(&mut self, state: AppState) {
@@ -78,9 +79,11 @@ pub async fn logic_task() {
     let mut selecting_state = selecting::SelectingState::new();
     let mut navigating_state = navigating::NavigatingState::new();
     let mut settings_state = settings::SettingsState::new();
+    let mut waypoints_state = waypoints::WaypointsState::new();
 
     loop {
-        if app.changed { // Run init and denit for states if in transition
+        if app.changed {
+            // Run init and denit for states if in transition
             match app.last {
                 AppState::Sleep => sleep_state.deintialize(&mut app).await,
                 _ => info!("def"),
@@ -94,7 +97,8 @@ pub async fn logic_task() {
             app.changed = false;
         }
 
-        match select4( // Await all possible changes
+        match select4(
+            // Await all possible changes
             BTNS.wait(),
             IMU_WATCH.receiver().unwrap().changed(),
             MAG_WATCH.receiver().unwrap().changed(),
@@ -103,24 +107,26 @@ pub async fn logic_task() {
         .await
         {
             Either4::First(button_call) => {
-                app.button_call = Some(button_call);
+                app.inputs.button = Some(button_call);
             }
             Either4::Second(imu_data) => {
-                app.imu = Some(imu_data);
+                app.inputs.imu = Some(imu_data);
             }
             Either4::Third(mag_data) => {
-                app.magn = Some(mag_data);
+                app.inputs.magn = Some(mag_data);
             }
             Either4::Fourth(gnss_data) => {
-                app.gnss = Some(gnss_data);
+                app.inputs.gnss = Some(gnss_data);
             }
         }
 
-        match app.current { // Give update to current states handler
+        match app.current {
+            // Give update to current states handler
             AppState::Sleep => sleep_state.handle(&mut app).await,
             AppState::Selecting => selecting_state.handle(&mut app).await,
             AppState::Navigating => navigating_state.handle(&mut app).await,
             AppState::Settings => settings_state.handle(&mut app).await,
+            AppState::Waypoints => waypoints_state.handle(&mut app).await,
         }
 
         app.clear_updates();

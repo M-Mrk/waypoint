@@ -1,11 +1,12 @@
 use super::{App, AppState};
+use crate::inputs::expander::{ButtonAction, ButtonCall, ButtonType};
 
-pub struct SettingsState {}
+pub struct WaypointsState {}
 
 #[allow(unused)]
-impl SettingsState {
+impl WaypointsState {
     pub fn new() -> Self {
-        SettingsState {}
+        WaypointsState {}
     }
 
     pub async fn handle(&mut self, app: &mut App) {

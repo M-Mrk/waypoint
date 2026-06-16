@@ -1,5 +1,6 @@
 use defmt::error;
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, watch::Watch};
+use embedded_graphics::mono_font::MonoTextStyle;
 use embedded_hal_bus::spi::ExclusiveDevice;
 use esp_hal::gpio;
 use esp_hal::time::Rate;
@@ -23,6 +24,8 @@ use esp_hal::ledc::{
     timer::{self, TimerIFace},
 };
 
+use profont::{PROFONT_12_POINT, PROFONT_18_POINT, PROFONT_24_POINT};
+
 type DisplayDriver = mipidsi::Display<
     SpiInterface<
         'static,
@@ -42,9 +45,9 @@ type FrameBuffer = FrameBuf<Rgb565, &'static mut FbData>;
 type FbData = [Rgb565; 240 * 240];
 static FB: StaticCell<FbData> = StaticCell::new();
 
+pub mod navigating;
+pub mod selecting;
 mod widgets;
-mod selecting;
-mod navigating;
 
 #[derive(Clone, PartialEq)]
 pub enum DisplayState {
@@ -54,6 +57,10 @@ pub enum DisplayState {
 }
 
 pub static DISPLAY_STATE: Watch<CriticalSectionRawMutex, DisplayState, 2> = Watch::new();
+
+const STD_STYLE: MonoTextStyle<'static, Rgb565> = MonoTextStyle::new(&PROFONT_18_POINT, Rgb565::WHITE);
+const LRG_STYLE: MonoTextStyle<'static, Rgb565> = MonoTextStyle::new(&PROFONT_24_POINT, Rgb565::CSS_BLANCHED_ALMOND);
+const SML_STYLE: MonoTextStyle<'static, Rgb565> = MonoTextStyle::new(&PROFONT_12_POINT, Rgb565::CSS_GRAY);
 
 #[embassy_executor::task]
 pub async fn display_task(

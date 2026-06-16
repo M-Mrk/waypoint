@@ -10,18 +10,16 @@ use embedded_graphics::{
 };
 use profont::{PROFONT_12_POINT, PROFONT_18_POINT, PROFONT_24_POINT};
 
+use super::FrameBuffer;
 use super::widgets::battery;
-use super::{FrameBuffer};
 
 #[derive(Clone, PartialEq)]
 pub struct State {
     pub waypoint_name: String<15>,
-    pub latitude: String<10>,
-    pub longitude: String<10>,
-    pub distance: u32,
-    pub distance_unit: String<2>,
+    pub latitude: f64,
+    pub longitude: f64,
+    pub distance: f64,
     pub height_delta: i32,
-    pub height_unit: String<2>,
     pub battery: BatteryState,
 }
 
@@ -50,16 +48,14 @@ fn waypoint(display: &mut FrameBuffer, state: &State) -> Result<(), ()> {
     .draw(display)
     .map_err(|_| ())?;
 
+    let text_lat: String<8> = format!("{}º", &state.latitude).map_err(|_| ())?;
+    Text::with_alignment(&text_lat, Point { x: 120, y: 85 }, minor_text_style, Center)
+        .draw(display)
+        .map_err(|_| ())?;
+
+    let text_long: String<8> = format!("{}º", &state.longitude).map_err(|_| ())?;
     Text::with_alignment(
-        &state.latitude,
-        Point { x: 120, y: 85 },
-        minor_text_style,
-        Center,
-    )
-    .draw(display)
-    .map_err(|_| ())?;
-    Text::with_alignment(
-        &state.longitude,
+        &text_long,
         Point { x: 120, y: 100 },
         minor_text_style,
         Center,
@@ -73,18 +69,20 @@ fn waypoint(display: &mut FrameBuffer, state: &State) -> Result<(), ()> {
 fn waypoint_details(display: &mut FrameBuffer, state: &State) -> Result<(), ()> {
     let text_style = MonoTextStyle::new(&PROFONT_18_POINT, Rgb565::WHITE);
 
-    let distance: String<7> =
-        format!("{}{}", state.distance, state.distance_unit).map_err(|_| ())?;
+    let distance: String<7> = match state.distance {
+        s if s < 10000_f64 => format!("{}m", state.distance).map_err(|_| ())?,
+        _ => format!("{}km", state.distance/1000_f64).map_err(|_| ())?,
+    };
     Text::with_alignment(&distance, Point { x: 120, y: 150 }, text_style, Center)
         .draw(display)
         .map_err(|_| ())?;
 
     let (color, pre_fix) = match state.distance {
-        b if b > 0 => (Rgb565::CSS_LIGHT_GREEN, "+"),
+        b if b > 0_f64 => (Rgb565::CSS_LIGHT_GREEN, "+"),
         _ => (Rgb565::CSS_CRIMSON, ""),
     };
     let text: String<10> =
-        format!("{}{}{}", pre_fix, state.height_delta, state.height_unit).map_err(|_| ())?;
+        format!("{}{}m", pre_fix, state.height_delta).map_err(|_| ())?;
     Text::with_alignment(
         &text,
         Point { x: 120, y: 170 },

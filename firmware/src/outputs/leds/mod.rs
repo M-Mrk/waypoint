@@ -53,10 +53,10 @@ async fn set_power_state(powered: bool) {
 
 /*
     Clockwise:
-    16  -> 0º
-    1   -> 90º
-    6   -> 180º
-    11  -> 270º
+    17  -> 0º
+    0   -> 90º
+    5   -> 180º
+    10  -> 270º
 */
 
 pub static LED_CMD: Channel<CriticalSectionRawMutex, LedCommands, 4> = Channel::new();

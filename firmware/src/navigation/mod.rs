@@ -1,40 +1,16 @@
 use defmt::warn;
-use heapless::String;
 use libm::{asin, atan2, atan2f, cos, cosf, pow, powf, sin, sinf, sqrt, sqrtf};
 
 use crate::inputs::{
     gnss::GnssData,
     sensors::{ImuData, MagData},
 };
-
-pub struct Coordinate {
-    pub lat: f64,
-    pub long: f64,
-    pub alt: Option<f32>,
-}
-impl Coordinate {
-    pub fn from_gnss(fix: GnssData) -> Result<Self, ()> {
-        if fix.latitude.is_none() || fix.longitude.is_none() {
-            return Err(());
-        }
-
-        Ok(Self {
-            lat: fix.latitude.unwrap(),
-            long: fix.longitude.unwrap(),
-            alt: fix.altitude_m,
-        })
-    }
-}
-
-pub struct Waypoint {
-    pub name: String<15>,
-    pub coordinate: Coordinate,
-}
+use crate::data::waypoints::{Coordinate, Waypoint};
 
 pub struct WaypointDifference {
-    distance_m: f64,
-    height_delta: Option<i32>,
-    needed_bearing: f64,
+    pub distance_m: f64, // in m
+    pub height_delta: Option<i32>, // in m
+    pub needed_bearing: f64, // in degrees
 }
 
 fn haversine_distance(from: &Coordinate, to: &Coordinate) -> f64 {
@@ -70,8 +46,8 @@ fn height_difference(from: &Coordinate, to: &Coordinate) -> Option<i32> {
 }
 
 pub fn calculate_waypoint_data(
-    waypoint: Waypoint,
-    last_fix: GnssData,
+    waypoint: &Waypoint,
+    last_fix: &GnssData,
 ) -> Result<WaypointDifference, ()> {
     let current_position = Coordinate::from_gnss(last_fix)?;
 

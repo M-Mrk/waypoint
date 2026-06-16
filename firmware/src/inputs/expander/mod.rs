@@ -1,5 +1,5 @@
 use crate::SharedI2c;
-use defmt::{error, info};
+use defmt::{Format, error, info};
 use embassy_embedded_hal::shared_bus::blocking::i2c::I2cDevice;
 use embassy_futures::select::{Either, select};
 use embassy_sync::channel::Channel;
@@ -72,7 +72,7 @@ pub struct CurrentConfig {
     expander: ExpanderDevice,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Format, Clone, Copy)]
 pub enum ButtonType {
     // TODO: implement these
     Left,
@@ -81,14 +81,14 @@ pub enum ButtonType {
     Power,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Format, Clone, Copy)]
 pub enum ButtonAction {
     Single,
     Double,
     Long,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Format, Clone, Copy)]
 pub struct ButtonCall {
     pub function: ButtonType,
     pub action: ButtonAction,
