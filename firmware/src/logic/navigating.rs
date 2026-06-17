@@ -4,14 +4,10 @@ use smart_leds::RGB8;
 
 use crate::inputs::gnss::GNSS_WATCH;
 use crate::inputs::sensors::{IMU_WATCH, MAG_WATCH};
-use crate::navigation::{WaypointDifference, calculate_waypoint_data, calculate_current_bearing};
+use crate::navigation::{WaypointDifference, calculate_current_bearing, calculate_waypoint_data};
 use crate::outputs::display;
 use crate::outputs::leds::{LED_CMD, LedCommands};
-use crate::{
-    inputs::expander::ButtonType,
-    outputs::display::{DISPLAY_STATE},
-    power::BATTERY_WATCH,
-};
+use crate::{inputs::expander::ButtonType, outputs::display::DISPLAY_STATE, power::BATTERY_WATCH};
 
 use crate::data::waypoints::{Waypoint, get_num_waypoints, get_waypoint_at_index};
 
@@ -24,15 +20,13 @@ pub struct NavigatingState {
 #[allow(unused)]
 impl NavigatingState {
     pub fn new() -> Self {
-        NavigatingState {
-            current_index: 0,
-        }
+        NavigatingState { current_index: 0 }
     }
 
     async fn next_waypoint(&mut self) {
-        if self.current_index+1 >= get_num_waypoints().await{
-           self.current_index = 0;
-           return; 
+        if self.current_index + 1 >= get_num_waypoints().await {
+            self.current_index = 0;
+            return;
         }
         self.current_index += 1;
     }
@@ -74,7 +68,9 @@ impl NavigatingState {
         self.update_all().await;
     }
 
-    pub async fn deintialize(&mut self, app: &mut App) {}
+    pub async fn deintialize(&mut self, app: &mut App) {
+        LED_CMD.send(LedCommands::Off);
+    }
 
     async fn update_display(&self, diff: &WaypointDifference) {
         let cur_way = self.get_waypoint().await;
@@ -106,9 +102,10 @@ impl NavigatingState {
                 distance: diff.distance_m,
                 height_delta: {
                     if diff.height_delta.is_none() {
-
+                        0 as i32
+                    } else {
+                        diff.height_delta.unwrap() as i32
                     }
-                    diff.height_delta.unwrap() as i32
                 },
             },
         ))
@@ -116,35 +113,35 @@ impl NavigatingState {
 
     async fn update_leds(&self, diff: &WaypointDifference) {
         let supposed_bearing = diff.needed_bearing as f32;
-        
+
         let imu_data = IMU_WATCH.receiver().unwrap().get().await;
         let mag_data = MAG_WATCH.receiver().unwrap().get().await;
         let current_bearing: f32 = calculate_current_bearing(&mag_data, &imu_data);
-        let delta_bearing = (current_bearing-supposed_bearing);
-        
+        let delta_bearing = (current_bearing - supposed_bearing);
+
         let degrees_to_turn = if delta_bearing < 0f32 {
             360_f32 - delta_bearing
         } else {
             delta_bearing
         };
         let normalized = degrees_to_turn % 360.0;
-        let normalized = if normalized < 0.0 { 
-            normalized + 360.0 
-        } else { 
-            normalized 
+        let normalized = if normalized < 0.0 {
+            normalized + 360.0
+        } else {
+            normalized
         };
-        
+
         // When horizontal and buttons on the right:
         // 0°   -> 17
         // 90°  -> 0
         // 180° -> 5
         // 270° -> 10
         // Each index represents 18° (360 / 20)
-        
+
         let offset_degrees = (normalized - 90.0 + 360.0) % 360.0;
-        
+
         let index = roundf((offset_degrees / 18.0)) as i32;
-        
+
         // Wrap to 0-19 range
         let led_position = ((index % 20 + 20) % 20) as u8;
         if led_position > 19 {
@@ -152,7 +149,10 @@ impl NavigatingState {
             return;
         }
 
-        LED_CMD.sender().send(LedCommands::Single(RGB8::new(255, 25, 25), led_position)).await;
+        LED_CMD
+            .sender()
+            .send(LedCommands::Single(RGB8::new(255, 25, 25), led_position))
+            .await;
     }
 
     async fn update_all(&self) {

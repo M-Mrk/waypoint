@@ -1,12 +1,14 @@
-use crate::{outputs::display::{LRG_STYLE, SML_STYLE}, power::BatteryState};
+use crate::{
+    outputs::display::{SML_STYLE},
+    power::BatteryState,
+};
 use embedded_graphics::{
-    mono_font::{self, MonoTextStyle, MonoTextStyleBuilder},
+    mono_font::{self, MonoTextStyle},
     pixelcolor::Rgb565,
     prelude::*,
     primitives::{self, PrimitiveStyle},
     text::{Alignment, Text},
 };
-use profont::{PROFONT_12_POINT, PROFONT_18_POINT, PROFONT_24_POINT};
 
 use heapless::{String, format};
 
@@ -84,12 +86,7 @@ pub fn battery(display: &mut FrameBuffer, state: &BatteryState) -> Result<(), ()
     Ok(())
 }
 
-pub fn menu(
-    display: &mut FrameBuffer,
-    options: &[&str],
-    selected: usize,
-    highlight_color: Rgb565,
-) {
+pub fn menu(display: &mut FrameBuffer, options: &[&str], selected: usize, highlight_color: Rgb565) {
     let item_height = 32u32;
     let box_width = 160u32;
     let center_x = 120i32;
@@ -99,7 +96,8 @@ pub fn menu(
         let y = start_y + (index as i32 * item_height as i32);
         let x = center_x - (box_width as i32 / 2);
 
-        let item_rect = primitives::Rectangle::new(Point::new(x, y), Size::new(box_width, item_height));
+        let item_rect =
+            primitives::Rectangle::new(Point::new(x, y), Size::new(box_width, item_height));
 
         // Draw background highlight if selected
         if index == selected {
@@ -140,15 +138,16 @@ pub fn select_box(
     highlight_color: Rgb565,
     background_color: Rgb565,
 ) {
-    let text_style = MonoTextStyle::new(&PROFONT_12_POINT, Rgb565::WHITE);
-
     let item_height = 28u32;
     let box_width = 140u32;
     let center_x = 120i32;
     let start_y = 72i32;
 
-    let header_y = start_y-item_height as i32;
-    let header_rect = primitives::Rectangle::new(Point::new(center_x - (box_width as i32 / 2), header_y), Size::new(box_width, item_height));
+    let header_y = start_y - item_height as i32;
+    let header_rect = primitives::Rectangle::new(
+        Point::new(center_x - (box_width as i32 / 2), header_y),
+        Size::new(box_width, item_height),
+    );
 
     header_rect
         .into_styled(PrimitiveStyle::with_fill(Rgb565::CSS_GOLDENROD))
@@ -160,24 +159,24 @@ pub fn select_box(
         .unwrap();
 
     Text::with_alignment(
-            "Select",
-            Point::new(center_x, header_y + (item_height as i32 / 2) + 3),
-            text_style,
-            Alignment::Center,
-        )
-        .draw(display)
-        .unwrap();
-
+        "Select",
+        Point::new(center_x, header_y + (item_height as i32 / 2) + 3),
+        SML_STYLE,
+        Alignment::Center,
+    )
+    .draw(display)
+    .unwrap();
 
     for (index, option) in options.iter().enumerate() {
         let y = start_y + (index as i32 * item_height as i32);
         let x = center_x - (box_width as i32 / 2);
-        let is_selected = index+1 == selected_index;
+        let is_selected = index + 1 == selected_index;
 
-        let item_rect = primitives::Rectangle::new(Point::new(x, y), Size::new(box_width, item_height));
+        let item_rect =
+            primitives::Rectangle::new(Point::new(x, y), Size::new(box_width, item_height));
 
         // Draw background highlight if selected
-        if  is_selected {
+        if is_selected {
             item_rect
                 .into_styled(PrimitiveStyle::with_fill(highlight_color))
                 .draw(display)
@@ -199,7 +198,7 @@ pub fn select_box(
         } else {
             Rgb565::WHITE
         };
-        let text_style = MonoTextStyle::new(text_style.font, text_color);
+        let text_style = MonoTextStyle::new(SML_STYLE.font, text_color);
 
         Text::with_alignment(
             option,
@@ -244,7 +243,7 @@ pub fn message_box(
     // Draw text (centered both horizontally and vertically)
     Text::with_alignment(
         message,
-        Point::new(center_x, center_y+font_y_adjustment),
+        Point::new(center_x, center_y + font_y_adjustment),
         STD_STYLE,
         Alignment::Center,
     )

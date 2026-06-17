@@ -29,9 +29,9 @@ impl SelectingState {
     }
 
     fn next_item(&mut self) {
-        if self.current_index+1 >= self.all_items.len(){
-           self.current_index = 0;
-           return; 
+        if self.current_index + 1 >= self.all_items.len() {
+            self.current_index = 0;
+            return;
         }
         self.current_index += 1;
     }

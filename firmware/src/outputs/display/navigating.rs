@@ -71,7 +71,7 @@ fn waypoint_details(display: &mut FrameBuffer, state: &State) -> Result<(), ()> 
 
     let distance: String<7> = match state.distance {
         s if s < 10000_f64 => format!("{}m", state.distance).map_err(|_| ())?,
-        _ => format!("{}km", state.distance/1000_f64).map_err(|_| ())?,
+        _ => format!("{}km", state.distance / 1000_f64).map_err(|_| ())?,
     };
     Text::with_alignment(&distance, Point { x: 120, y: 150 }, text_style, Center)
         .draw(display)
@@ -81,8 +81,7 @@ fn waypoint_details(display: &mut FrameBuffer, state: &State) -> Result<(), ()> 
         b if b > 0_f64 => (Rgb565::CSS_LIGHT_GREEN, "+"),
         _ => (Rgb565::CSS_CRIMSON, ""),
     };
-    let text: String<10> =
-        format!("{}{}m", pre_fix, state.height_delta).map_err(|_| ())?;
+    let text: String<10> = format!("{}{}m", pre_fix, state.height_delta).map_err(|_| ())?;
     Text::with_alignment(
         &text,
         Point { x: 120, y: 170 },

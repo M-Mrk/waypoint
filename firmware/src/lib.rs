@@ -1,10 +1,10 @@
 #![no_std]
+pub mod data;
 pub mod inputs;
 pub mod logic;
 pub mod navigation;
 pub mod outputs;
 pub mod power;
-pub mod data;
 
 use embassy_embedded_hal::shared_bus::blocking::i2c::I2cDevice;
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;

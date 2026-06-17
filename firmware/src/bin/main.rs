@@ -105,7 +105,7 @@ async fn main(spawner: Spawner) -> ! {
         gpio::OutputConfig::default(),
     );
 
-    let power_en_pins = firmware::power::PowerPins {
+    let power_en_pins = power::PowerPins {
         main_en: main_power_en,
         gnss_en: gnss_power_en,
         leds_en: leds_power_en,
@@ -114,7 +114,7 @@ async fn main(spawner: Spawner) -> ! {
     let mut battery_adc_config = adc::AdcConfig::new();
     let batt_pin = battery_adc_config.enable_pin(peripherals.GPIO1, adc::Attenuation::_11dB);
     let batt_sense = adc::Adc::new(peripherals.ADC1, battery_adc_config).into_async();
-    if let Ok(token) = firmware::power::power_management_task(power_en_pins, batt_sense, batt_pin) {
+    if let Ok(token) = power::power_management_task(power_en_pins, batt_sense, batt_pin) {
         spawner.spawn(token);
     } else {
         error!("Failed to create power task");
@@ -214,6 +214,13 @@ async fn main(spawner: Spawner) -> ! {
         spawner.spawn(token);
     } else {
         error!("Failed to create display task")
+    }
+
+    // Core logic task
+    if let Ok(token) = logic::logic_task() {
+        spawner.spawn(token);
+    } else {
+        error!("Failed to create logic task")
     }
 
     loop {

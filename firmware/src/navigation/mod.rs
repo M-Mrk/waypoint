@@ -1,16 +1,16 @@
 use defmt::warn;
 use libm::{asin, atan2, atan2f, cos, cosf, pow, powf, sin, sinf, sqrt, sqrtf};
 
+use crate::data::waypoints::{Coordinate, Waypoint};
 use crate::inputs::{
     gnss::GnssData,
     sensors::{ImuData, MagData},
 };
-use crate::data::waypoints::{Coordinate, Waypoint};
 
 pub struct WaypointDifference {
-    pub distance_m: f64, // in m
+    pub distance_m: f64,           // in m
     pub height_delta: Option<i32>, // in m
-    pub needed_bearing: f64, // in degrees
+    pub needed_bearing: f64,       // in degrees
 }
 
 fn haversine_distance(from: &Coordinate, to: &Coordinate) -> f64 {

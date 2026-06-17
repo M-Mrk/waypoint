@@ -8,11 +8,8 @@ use esp_hal::{Blocking, spi};
 use static_cell::StaticCell;
 
 use embedded_graphics::{
-    mono_font,
     pixelcolor::Rgb565,
     prelude::*,
-    primitives,
-    text::{Alignment, Text},
 };
 use embedded_graphics_framebuf::FrameBuf;
 use mipidsi::interface::SpiInterface;
@@ -47,6 +44,8 @@ static FB: StaticCell<FbData> = StaticCell::new();
 
 pub mod navigating;
 pub mod selecting;
+pub mod waypoints;
+pub mod settings;
 mod widgets;
 
 #[derive(Clone, PartialEq)]
@@ -54,13 +53,19 @@ pub enum DisplayState {
     Off,
     MainPage(selecting::State),
     Navigation(navigating::State),
+    Waypoints(waypoints::State),
+    Settings(settings::State),
 }
 
 pub static DISPLAY_STATE: Watch<CriticalSectionRawMutex, DisplayState, 2> = Watch::new();
 
-const STD_STYLE: MonoTextStyle<'static, Rgb565> = MonoTextStyle::new(&PROFONT_18_POINT, Rgb565::WHITE);
-const LRG_STYLE: MonoTextStyle<'static, Rgb565> = MonoTextStyle::new(&PROFONT_24_POINT, Rgb565::CSS_BLANCHED_ALMOND);
-const SML_STYLE: MonoTextStyle<'static, Rgb565> = MonoTextStyle::new(&PROFONT_12_POINT, Rgb565::CSS_GRAY);
+const STD_STYLE: MonoTextStyle<'static, Rgb565> =
+    MonoTextStyle::new(&PROFONT_18_POINT, Rgb565::WHITE);
+#[allow(unused)]
+const LRG_STYLE: MonoTextStyle<'static, Rgb565> =
+    MonoTextStyle::new(&PROFONT_24_POINT, Rgb565::CSS_BLANCHED_ALMOND);
+const SML_STYLE: MonoTextStyle<'static, Rgb565> =
+    MonoTextStyle::new(&PROFONT_12_POINT, Rgb565::CSS_GRAY);
 
 #[embassy_executor::task]
 pub async fn display_task(
@@ -144,6 +149,12 @@ pub async fn display_task(
             }
             DisplayState::Navigation(state) => {
                 navigating::draw(&mut fb, &state).await;
+            }
+            DisplayState::Waypoints(state) => {
+                waypoints::draw(&mut fb, &state).await;
+            }
+            DisplayState::Settings(state) => {
+                settings::draw(&mut fb, &state).await;
             }
             DisplayState::Off => {
                 if display.sleep(&mut sleep_delay).is_err() {

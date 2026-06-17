@@ -1,9 +1,7 @@
-use defmt::{error, Format};
-use esp_storage::FlashStorage;
-use heapless::{Vec, String};
-use embassy_sync::mutex::Mutex;
+use defmt::{Format};
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
-
+use embassy_sync::mutex::Mutex;
+use heapless::{String, Vec};
 
 use crate::inputs::gnss::GnssData;
 
@@ -27,13 +25,15 @@ impl Coordinate {
     }
 }
 
+pub const MAX_WAYPOINTS: usize = 12;
+pub const MAX_NAME_LENGTH: usize = 15;
+
 #[derive(Clone)]
 pub struct Waypoint {
-    pub name: String<15>,
+    pub name: String<MAX_NAME_LENGTH>,
     pub coordinate: Coordinate,
 }
 
-const MAX_WAYPOINTS: usize = 12;
 
 pub type WaypointList = heapless::Vec<Waypoint, MAX_WAYPOINTS>;
 static WAYPOINTS: Mutex<CriticalSectionRawMutex, WaypointList> = Mutex::new(Vec::new());
