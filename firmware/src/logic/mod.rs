@@ -86,13 +86,19 @@ pub async fn logic_task() {
             // Run init and denit for states if in transition
             match app.last {
                 AppState::Sleep => sleep_state.deintialize(&mut app).await,
-                _ => info!("def"),
+                AppState::Selecting => selecting_state.deintialize(&mut app).await,
+                AppState::Navigating => navigating_state.deintialize(&mut app).await,
+                AppState::Settings => settings_state.deintialize(&mut app).await,
+                AppState::Waypoints => waypoints_state.deintialize(&mut app).await,
             }
 
             info!("AppState changed to {}", &&app.current);
             match app.current {
                 AppState::Sleep => sleep_state.initalize(&mut app).await,
-                _ => info!("AppState changed to {}", &&app.current),
+                AppState::Selecting => selecting_state.initalize(&mut app).await,
+                AppState::Navigating => navigating_state.initalize(&mut app).await,
+                AppState::Settings => settings_state.initalize(&mut app).await,
+                AppState::Waypoints => waypoints_state.initalize(&mut app).await,
             }
             app.changed = false;
         }

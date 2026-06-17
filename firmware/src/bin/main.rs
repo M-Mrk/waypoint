@@ -87,12 +87,6 @@ async fn main(spawner: Spawner) -> ! {
     let _ = spawner;
 
     // power
-    let mut built_in_led = gpio::Output::new(
-        peripherals.GPIO15,
-        gpio::Level::Low,
-        gpio::OutputConfig::default(),
-    );
-
     let gnss_power_en = gpio::Output::new(
         peripherals.GPIO8,
         gpio::Level::Low,
@@ -224,7 +218,7 @@ async fn main(spawner: Spawner) -> ! {
     }
 
     loop {
-        Timer::after(Duration::from_secs(1)).await;
-        built_in_led.toggle();
+        Timer::after(Duration::from_secs(5)).await;
+        info!("Alive!");
     }
 }
